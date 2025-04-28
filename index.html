@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optimus Prime TV++ Premium</title>
+  <link rel="icon" type="image/ico" href="icons/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <!-- bisschen CSS für Buttons und Bilder -->
+  <style>
+    body { font-family: 'Open Sans', sans-serif; }
+    .btn-primary { background-color: #FF3B3B; color: #fff; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 600; }
+    .btn-primary:hover { background-color: #4DA6FF; }
+    .series-image { width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 0.5rem; }
+    .icon { height: 2rem; width: 2rem; object-fit: contain; margin-right: 0.5rem; flex-shrink: 0; }
+  </style>
+</head>
+<body class="bg-[#0E1A2B] text-white">
+
+<!-- Login -->
+<div id="login-screen" class="flex items-center justify-center min-h-screen">
+  <div class="bg-white text-black p-8 rounded shadow-lg w-80">
+    <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+    <input id="login-username" type="text" placeholder="Benutzername" class="w-full mb-4 p-2 border rounded">
+    <input id="login-password" type="password" placeholder="Passwort" class="w-full mb-6 p-2 border rounded">
+    <button onclick="checkLogin()" class="btn-primary w-full">Einloggen</button>
+    <p id="login-error" class="text-red-500 mt-4 hidden text-center">Falsche Zugangsdaten!</p>
+    <p onclick="showResetScreen()" class="mt-4 text-sm text-blue-500 text-center cursor-pointer">Passwort vergessen?</p>
+  </div>
+</div>
+
+<!-- Passwort-Reset -->
+<div id="reset-screen" class="hidden flex items-center justify-center min-h-screen">
+  <div class="bg-white text-black p-8 rounded shadow-lg w-80">
+    <h2 class="text-2xl font-bold mb-6 text-center">Passwort zurücksetzen</h2>
+    <input id="new-password" type="password" placeholder="Neues Passwort" class="w-full mb-6 p-2 border rounded">
+    <button onclick="resetPassword()" class="btn-primary w-full">Speichern</button>
+  </div>
+</div>
+
+<!-- App -->
+<div id="main-app" class="hidden">
+
+<header class="p-4 flex justify-between items-center bg-[#0E1A2B] shadow">
+  <div class="flex items-center space-x-2">
+    <img src="icons/logo.png" alt="Logo" class="h-10 w-10">
+    <h1 class="text-2xl font-bold">Optimus Prime TV++ Premium</h1>
+  </div>
+  <nav class="space-x-4">
+    <a href="#home" class="hover:text-[#4DA6FF]">Home</a>
+    <a href="#watchlist" class="hover:text-[#4DA6FF]">Watchlist</a>
+    <a href="#settings" class="hover:text-[#4DA6FF]">Einstellungen</a>
+    <button onclick="openProfileModal()" class="btn-primary">Profil</button>
+  </nav>
+</header>
+
+<section class="p-8" id="home">
+  <h2 class="text-xl font-semibold mb-4">Finde deine Serie</h2>
+  <div class="flex space-x-2">
+    <input type="text" placeholder="Titel eingeben" class="flex-grow p-2 rounded text-black">
+    <button class="btn-primary flex items-center space-x-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
+      </svg>
+    </button>
+  </div>
+</section>
+
+<section class="p-8">
+  <h2 class="text-xl font-semibold mb-4">Suchergebnisse</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Breaking Bad Card -->
+    <div class="bg-white text-black p-4 rounded shadow">
+      <img src="icons/breaking_bad.png" alt="Breaking Bad" class="series-image">
+      <h3 class="font-bold">Breaking Bad</h3>
+      <p class="text-sm flex items-center">
+        <img src="icons/netflix.png" class="icon"> <a href="https://www.netflix.com" target="_blank" class="hover:underline">Verfügbar auf Netflix</a>
+      </p>
+      <button onclick="openModal('Breaking Bad')" class="btn-primary mt-4">Mehr Infos</button>
+      <button onclick="addToWatchlist('Breaking Bad')" class="btn-primary mt-2">Zur Watchlist</button>
+    </div>
+
+    <!-- Stranger Things Card -->
+    <div class="bg-white text-black p-4 rounded shadow">
+      <img src="icons/stranger_things.png" alt="Stranger Things" class="series-image">
+      <h3 class="font-bold">Stranger Things</h3>
+      <p class="text-sm flex items-center">
+        <img src="icons/netflix.png" class="icon"> <a href="https://www.netflix.com" target="_blank" class="hover:underline">Verfügbar auf Netflix</a>
+      </p>
+      <button onclick="openModal('Stranger Things')" class="btn-primary mt-4">Mehr Infos</button>
+      <button onclick="addToWatchlist('Stranger Things')" class="btn-primary mt-2">Zur Watchlist</button>
+    </div>
+  </div>
+</section>
+
+<!-- Watchlist -->
+<section class="p-8" id="watchlist">
+  <h2 class="text-xl font-semibold mb-4">Meine Watchlist</h2>
+  <div id="watchlist-items" class="space-y-4"></div>
+</section>
+
+<section class="p-8 bg-[#13243b]" id="settings">
+  <h2 class="text-xl font-semibold mb-4">Einstellungen</h2>
+  <div class="space-y-4">
+    <div class="flex justify-between items-center">
+      <span>Benachrichtigungen bei neuen Staffeln</span>
+      <input type="checkbox" class="accent-[#FF3B3B]">
+    </div>
+    <div class="flex justify-between items-center">
+      <span>Empfehlungen basierend auf Sehgewohnheiten</span>
+      <input type="checkbox" class="accent-[#FF3B3B]">
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="p-4 text-center text-xs bg-[#0E1A2B]">
+  &copy; 2025 Optimus Prime TV++ Premium
+</footer>
+
+<!-- Serien-Modal -->
+<div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white text-black p-6 rounded shadow-lg max-w-md">
+    <div id="modal-content"></div>
+    <button onclick="closeModal()" class="btn-primary mt-6">Schließen</button>
+  </div>
+</div>
+
+<!-- Profil-Modal -->
+<div id="profileModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white text-black p-6 rounded shadow-lg max-w-md">
+    <h3 class="text-2xl font-bold mb-4">Profil verwalten</h3>
+    <form id="profileForm" class="space-y-4">
+      <div>
+        <label class="block mb-1 font-semibold">Benutzername:</label>
+        <input type="text" id="profile-username" class="w-full p-2 border rounded">
+      </div>
+      <div>
+        <label class="block mb-1 font-semibold">E-Mail:</label>
+        <input type="email" id="profile-email" class="w-full p-2 border rounded">
+      </div>
+      <div>
+        <label class="block mb-1 font-semibold">Neues Passwort:</label>
+        <input type="password" id="profile-password" class="w-full p-2 border rounded">
+      </div>
+      <div class="flex justify-between">
+        <button type="button" onclick="saveProfile()" class="btn-primary">Speichern</button>
+        <button type="button" onclick="logout()" class="btn-primary bg-gray-500 hover:bg-gray-600">Logout</button>
+      </div>
+    </form>
+    <button onclick="closeProfileModal()" class="btn-primary mt-4">Schließen</button>
+  </div>
+</div>
+
+<!-- Logik -->
+<script>
+let user = { username: 'admin', email: 'admin@example.com', password: 'admin' };
+
+function checkLogin() {
+  const userInput = document.getElementById('login-username').value;
+  const passInput = document.getElementById('login-password').value;
+  if (userInput === user.username && passInput === user.password) {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
+  } else {
+    document.getElementById('login-error').classList.remove('hidden');
+  }
+}
+
+function showResetScreen() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('reset-screen').classList.remove('hidden');
+}
+
+function resetPassword() {
+  const newPass = document.getElementById('new-password').value;
+  if (newPass.trim() !== '') {
+    user.password = newPass;
+    alert('Neues Passwort gespeichert!');
+    document.getElementById('reset-screen').classList.add('hidden');
+    document.getElementById('login-screen').classList.remove('hidden');
+  }
+}
+
+function openProfileModal() {
+  document.getElementById('profile-username').value = user.username;
+  document.getElementById('profile-email').value = user.email;
+  document.getElementById('profileModal').classList.remove('hidden');
+}
+
+function closeProfileModal() {
+  document.getElementById('profileModal').classList.add('hidden');
+}
+
+function saveProfile() {
+  user.username = document.getElementById('profile-username').value;
+  user.email = document.getElementById('profile-email').value;
+  const newPass = document.getElementById('profile-password').value;
+  if (newPass.trim() !== '') user.password = newPass;
+  alert('Profil erfolgreich aktualisiert!');
+  closeProfileModal();
+}
+
+function logout() {
+  location.reload();
+}
+
+function openModal(series) {
+  const modalContent = document.getElementById('modal-content');
+  if (series === 'Breaking Bad') {
+    modalContent.innerHTML = `
+      <h3 class="text-2xl font-bold mb-4">Breaking Bad</h3>
+      <p class="mb-4">Ein Chemielehrer, bei dem inoperabler Lungenkrebs diagnostiziert wurde, stellt zusammen mit einem ehemaligen Schüler Methamphetamin her und verkauft es, um die Zukunft seiner Familie zu sichern.</p>
+      <h4 class="text-lg font-semibold mb-2">Kritische Bewertungen</h4>
+      <div class="flex items-center space-x-4 mb-2">
+        <a href="https://www.imdb.com/title/tt0903747/" target="_blank"><img src="icons/imdb.png" class="icon"></a>
+        <p>9.5/10</p>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="https://www.rottentomatoes.com/tv/breaking_bad" target="_blank"><img src="icons/rotten_tomatoes.png" class="icon"></a>
+        <p>96% Fresh</p>
+      </div>
+    `;
+  } else if (series === 'Stranger Things') {
+    modalContent.innerHTML = `
+      <h3 class="text-2xl font-bold mb-4">Stranger Things</h3>
+      <p class="mb-4">Im Indiana der 1980er Jahre wird eine Gruppe junger Freunde Zeuge übernatürlicher Kräfte und geheimer Machenschaften der Regierung. Auf der Suche nach Antworten kommen die Kinder einer Reihe von außergewöhnlichen Rätseln auf die Spur.</p>
+      <h4 class="text-lg font-semibold mb-2">Kritische Bewertungen</h4>
+      <div class="flex items-center space-x-4 mb-2">
+        <a href="https://www.imdb.com/title/tt4574334/" target="_blank"><img src="icons/imdb.png" class="icon"></a>
+        <p>8.7/10</p>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="https://www.rottentomatoes.com/tv/stranger_things" target="_blank"><img src="icons/rotten_tomatoes.png" class="icon"></a>
+        <p>93% Fresh</p>
+      </div>
+    `;
+  }
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+}
+
+function addToWatchlist(seriesName) {
+  const watchlist = document.getElementById('watchlist-items');
+  const entry = document.createElement('div');
+  entry.className = 'bg-white text-black p-4 rounded flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0';
+
+  entry.innerHTML = `
+    <div class="flex items-center space-x-4">
+      <img src="icons/netflix.png" alt="Netflix" class="icon">
+      <span class="font-semibold">${seriesName}</span>
+    </div>
+    <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-2">
+      <select class="border rounded p-2 text-black season-select">
+        <option selected disabled>Staffel wählen</option>
+        <option value="1">Staffel 1</option>
+        <option value="2">Staffel 2</option>
+      </select>
+      <select class="border rounded p-2 text-black episode-select" disabled>
+        <option>Bitte Staffel wählen</option>
+      </select>
+      <button onclick="saveProgress(this)" class="btn-primary">Merken</button>
+      <button onclick="this.closest('div').parentElement.remove()" class="btn-primary">Entfernen</button>
+    </div>
+    <div class="saved-progress mt-2 text-sm hidden text-green-600 font-semibold"></div>
+  `;
+  watchlist.appendChild(entry);
+
+  const seasonSelect = entry.querySelector('.season-select');
+  seasonSelect.addEventListener('change', function() {
+    updateEpisodeSelection(seasonSelect, seriesName);
+  });
+}
+
+function updateEpisodeSelection(selectElement, seriesName) {
+  const episodeSelect = selectElement.parentElement.querySelector('.episode-select');
+  const staffel = selectElement.value;
+
+  let episodes = [];
+  
+  if (seriesName === "Breaking Bad") {
+    if (staffel === "1") {
+      episodes = ["Pilot", "Die Katze ist im Sack"];
+    } else if (staffel === "2") {
+      episodes = ["Sieben Dreißig", "Blutgeld"];
+    }
+  } else if (seriesName === "Stranger Things") {
+    if (staffel === "1") {
+      episodes = ["Die Verschwundene von Hawkins", "Die Verrückte auf der Straße"];
+    } else if (staffel === "2") {
+      episodes = ["MadMax", "Trick or Treat, Freak"];
+    }
+  }
+
+  episodeSelect.innerHTML = episodes.map(ep => `<option>${ep}</option>`).join('');
+  episodeSelect.disabled = false;
+}
+
+function saveProgress(button) {
+  const container = button.parentElement;
+  const season = container.querySelector('.season-select').value;
+  const episode = container.querySelector('.episode-select').value;
+
+  const progressDisplay = container.parentElement.querySelector('.saved-progress');
+  progressDisplay.innerText = `Staffel ${season}, Episode "${episode}"`;
+  progressDisplay.classList.remove('hidden');
+}
+</script>
+</body>
+</html>
